@@ -18,7 +18,6 @@ public class Main {
 	public static void main(String...arg) throws FileNotFoundException {
 
         int source , destination, weight;
-        int start;
         int number_of_edges,number_of_vertices;
         int count = 1;
         int directed = 0;
@@ -47,9 +46,8 @@ public class Main {
                 count++;
             }
             
-            //System.out.println("Enter the start node for BFS");
-            start = scan.nextInt();
             G.printAdjacencyList();
+//            G.printInEdges(6);
 //            G.BFS(start);
 //            G.DFS();
 //            G.Dijkstra(1);

@@ -60,7 +60,7 @@ public class Graph
            return;
        }
 
-       List<Edge> sList =  this.getEdge(source);
+       List<Edge> sList =  this.getOutEdgeList(source);
        for(Iterator<Edge> it = sList.iterator(); it.hasNext(); ){
     	   Edge e = it.next();
     	   if(e.getEndVertex() == destination){
@@ -82,7 +82,7 @@ public class Graph
    }
     
     /* Returns the List containing the vertex joining the source vertex */
-    public List<Edge> getEdge(int source)
+    public List<Edge> getOutEdgeList(int source)
     {
         if (source > Adjacency_List.size())
         {
@@ -92,8 +92,18 @@ public class Graph
 
         return Adjacency_List.get(source);
     }
-
-
+    
+    /* Checks if there exists an edge between source and destination */
+    boolean hasEdge(int source, int destination) {
+        List<Edge> sList =  this.getOutEdgeList(source);
+        for(Iterator<Edge> it = sList.iterator(); it.hasNext(); ){
+     	   Edge e = it.next();
+     	   if(e.getEndVertex() == destination){
+     		   return true;
+     	   }
+        }
+        return false;
+    }
 
     /* Prints the adjacency List representing the graph.*/
     public void printAdjacencyList(){
@@ -106,30 +116,64 @@ public class Graph
         for (int i = 1 ; i <= nVertices ; i++)
         {
            	System.out.print(i+"->[");
-            List<Edge> edgeList =  this.getEdge(i);
-            for (int j = 1 ; ; j++ )
+            List<Edge> edgeList =  this.getOutEdgeList(i);
+            for (int j = 0 ; ; j++ )
             {
-           	 if(!edgeList.isEmpty()){
-                    if (j != edgeList.size())
-                    {
-                        System.out.print((edgeList.get(j - 1)).getVertex()+"->");
-                    }else
-                    {
-                        System.out.print((edgeList.get(j - 1)).getVertex() + "]");
-                        break;
-                    }
-           	 }else{
-           		 System.out.print("]");
-           		 break;
-           	 }
-           		 
+            	if(edgeList.isEmpty()){
+           	 		System.out.print("]");
+           	 		break;       	 		
+           	 	}else if (j < edgeList.size()-1) {
+                    System.out.print((edgeList.get(j)).getVertex()+"->");
+                }else {
+                	System.out.print((edgeList.get(j)).getVertex() + "]");
+                    break;
+                }	
             }
-
             System.out.println();
          } 
         
     }
    
+    /* Returns the List containing the vertex joining the source vertex */
+    public List<Edge> getInEdgeList(int source)
+    {
+        if (source > Adjacency_List.size())
+        {
+            System.out.println("The vertex " + source + " is not present");
+            return null;
+        }
+
+        List<Edge> edges = new LinkedList<Edge>();
+        for (int i = 1 ; i <= nVertices ; i++){
+            List<Edge> list =  this.getOutEdgeList(i);
+            for(Iterator<Edge> it = list.iterator(); it.hasNext(); ){
+         	   Edge e = it.next();
+         	   if(e.getEndVertex() == source)
+         		   edges.add(e);
+            }
+        }
+        return edges;
+    }
+
+    /* Prints the inEdges List representing the graph.*/
+    public void printInEdges(int i){
+    	System.out.println("In-Edges for " + i);
+    	
+       	System.out.print(i+"->[");
+        List<Edge> edgeList =  this.getInEdgeList(i);
+        for (int j = 0 ; ; j++ )
+        {
+        	if(edgeList.isEmpty()){
+       	 		System.out.print("]");
+       	 		break;       	 		
+       	 	}else if (j < edgeList.size()-1) {
+                System.out.print((edgeList.get(j)).StartVertex+"->");
+            }else {
+            	System.out.print((edgeList.get(j)).StartVertex + "]");
+                break;
+            }	
+        }
+    }
     
     
     //Breadth First Search
