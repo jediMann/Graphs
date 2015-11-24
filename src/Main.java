@@ -13,6 +13,9 @@ public class Main {
      *  BFS(start);
      *  DFS();
      *  Dijkistra's
+     *  Presence of a cycle using DFS traversal;
+     *  TopologicalSort()
+     *  TransposeGraph()
      */
 
 	public static void main(String...arg) throws FileNotFoundException {
@@ -22,7 +25,7 @@ public class Main {
         int count = 1;
         int directed = 0;
         // Scanner scan = new Scanner(System.in);
-        Scanner scan = new Scanner(new File("Input.txt"));        
+        Scanner scan = new Scanner(new File("SCC.txt"));        
         try
         {
             //Read the number of vertices and edges in graph
@@ -46,13 +49,20 @@ public class Main {
                 count++;
             }
             
-            G.printAdjacencyList();
-//            G.printInEdges(6);
-//            G.BFS(start);
-//            G.DFS();
-//            G.Dijkstra(1);
-//            G.Prims_MST(1);
-                                    
+            G.printAdjacencyList(); 
+            G.BFS(1);
+            G.PrintDFSTraversal();
+            G.Dijkstra(1);
+            G.Prims_MST(1);
+            G.TopologicalSort();
+            G.DFS_CYCLE();
+            
+            Graph GT = G.TransposeGraph();
+            System.out.println("----TRANSPOSE--------");
+  	      	GT.printAdjacencyList();
+  	      	
+      	  	int nSCC = G.StronglyConnectedComponents();
+            System.out.println("Number of Strongly connected component : " + nSCC);
          } 
          catch(InputMismatchException inputMismatch)
          {

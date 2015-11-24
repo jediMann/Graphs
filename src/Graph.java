@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.LinkedList;
 
 import java.util.Map;
+import java.util.Stack;
 import java.util.HashMap;
 
 public class Graph 
@@ -11,6 +12,7 @@ public class Graph
    /* Makes use of Map collection to store the adjacency list for each vertex.*/
     private  Map<Integer, List<Edge> > Adjacency_List;	
 	private  Map<Integer, Vertex> V = null;
+	private  Stack<Vertex> topologicalStack;
 	private int nVertices;
 	private int directed; //directed = 1 means directed, otherwise not
 	
@@ -24,6 +26,7 @@ public class Graph
     	nVertices = number_of_vertices;
     	V = new HashMap<Integer, Vertex>();
         Adjacency_List = new HashMap<Integer, List<Edge>>();	
+        topologicalStack = new Stack<Vertex>();
 
     	for (int i = 1 ; i <= nVertices ; i++)
         	V.put(i , new Vertex(i,ColorType.White, Integer.MAX_VALUE, 0));
@@ -50,6 +53,7 @@ public class Graph
   	       dlist.add(new Edge(destination, source, weight));
   	   }
    }
+    
 
     /* Removes nodes in the Adjacency list for the corresponding vertex */
     public void removeEdge(int source , int destination)
@@ -154,6 +158,8 @@ public class Graph
         }
         return edges;
     }
+    
+    
 
     /* Prints the inEdges List representing the graph.*/
     public void printInEdges(int i){
@@ -174,6 +180,7 @@ public class Graph
             }	
         }
     }
+    
     
     
     //Breadth First Search
@@ -218,7 +225,8 @@ public class Graph
     //Depth First Search
     void DFS(){
     	int time = 0;
-    	System.out.println("----------DFS---------");
+    	System.out.println("----------Executing DFS---------");
+    	topologicalStack.clear();
     	
     	for(int i=1 ; i<= nVertices ; i++){
     		V.get(i).setVertex(i, ColorType.White, 0, 0 );
@@ -227,13 +235,9 @@ public class Graph
     	for(int i=1 ; i<= nVertices ; i++){
     		if(V.get(i).Color == ColorType.White)
     			time = DFS_VISIT(i, time);
-     	}
-    	
-    	for(int i =1 ;i <= nVertices; i++){
-    		System.out.println("Node "+ i + " -> (" + V.get(i).d +", " + V.get(i).f + ")" );    		
-    	}
-
+     	}    	
     }
+    
     
     int DFS_VISIT(int u, int time){
     	
@@ -253,13 +257,30 @@ public class Graph
     	}
 		V.get(u).Color = ColorType.Black;
 		time = time + 1;
-		V.get(u).f = time; 
+		V.get(u).f = time;
+		topologicalStack.push(V.get(u));
 		    	
     	return time;
     }
     
+    void PrintDFSTraversal(){
+    	DFS();
+    	for(int i =1 ;i <= nVertices; i++){
+    		System.out.println("Node "+ i + " -> (" + V.get(i).d +", " + V.get(i).f + ")" );    		
+    	}
+    }
     
+    //Topological Sort modifying DFS
+    void TopologicalSort(){
+    	System.out.println("----------Topological Sort---------");    	
+    	DFS();
+    	while(!topologicalStack.isEmpty()){
+    		System.out.print(topologicalStack.pop().getVertex() + " ");    		
+    	}
+    	System.out.println();
+    }
     
+        
     //Dijkstra Minimum Spanning Tree
     void Dijkstra( int s){
     	
@@ -353,5 +374,100 @@ public class Graph
    	    System.out.println("Length of Prim's Shortest Path is : " + lengthShortestPath);
     }
 
+           
+    //Depth First Search to print the no. of cycles in a graph
+    void DFS_CYCLE(){
+    	System.out.println("----------DFS_CYCLES---------");
+    	
+    	for(int i=1 ; i<= nVertices ; i++){
+    		V.get(i).setVertex(i, ColorType.White, 0, 0 );
+    	}
+    	
+    	for(int i=1 ; i<= nVertices ; i++){
+    		if(V.get(i).Color == ColorType.White)
+    			DFS_VISIT_PRINT_CYCLE(i);
+     	}
+    }   
+    
+    void DFS_VISIT_PRINT_CYCLE(int u){    	
+    	int v;    	
+    	V.get(u).Color = ColorType.Gray;
+    	List<Edge> ulist = Adjacency_List.get(u);
+    	for(Iterator<Edge> it = ulist.iterator(); it.hasNext(); ){
+    		Edge e = it.next();
+    		v = e.getEndVertex();
+    		if(	V.get(v).Color != ColorType.White){
+				System.out.println("Cycle exists at " + V.get(v).getVertex());    		
+    		} else {
+    			V.get(v).p = u;
+    			DFS_VISIT_PRINT_CYCLE(v);
+    		}
+    	}
+		V.get(u).Color = ColorType.Black;		    	
+    }
 
+    
+    
+    Graph TransposeGraph(){
+        
+    	Graph GT = new Graph(nVertices, directed);
+        for(int i= 1; i<=nVertices; i++){        	
+            List<Edge> list = getInEdgeList(i);
+
+            /* Take a list of incoming edges of a node, reverse it 
+             * and add it to adjacency list of the node for the new graph*/
+            List<Edge> slist = GT.Adjacency_List.get(i);
+            for(Iterator<Edge> it = list.iterator(); it.hasNext(); ){
+         	   Edge e = it.next();
+           	   slist.add(new Edge(e.EndVertex, e.StartVertex, e.Weight));
+            }   
+        }
+    	return GT;
+    }
+    
+    
+    int StronglyConnectedComponents(){
+    	
+    	System.out.println("-----Strongly Connected Components-----");
+    	
+    	DFS();
+    	Graph GT = TransposeGraph();
+    	return GT.DFS_WithDecreasingFinishTimes(topologicalStack);
+    }
+    
+    int DFS_WithDecreasingFinishTimes(Stack<Vertex> S){
+    	int count=0;
+    	
+    	for(int i=1 ; i<= nVertices ; i++){
+    		V.get(i).setVertex(i, ColorType.White, 0, 0 );
+    	}
+
+    	while(!S.isEmpty()){
+    		int i = S.pop().getVertex();   		    		
+    		if(V.get(i).Color == ColorType.White){
+    			DFS_SCC_VISIT(i);
+    			System.out.println();
+    			count++;
+    		}
+     	}
+    	return count;
+    }
+        
+    void DFS_SCC_VISIT(int u){    	
+    	int v;    	
+    	V.get(u).Color = ColorType.Gray;
+		System.out.print( V.get(u).getVertex() + " ");    		
+		
+    	List<Edge> ulist = Adjacency_List.get(u);
+    	for(Iterator<Edge> it = ulist.iterator(); it.hasNext(); ){
+    		Edge e = it.next();
+    		v = e.getEndVertex();
+    		if(	V.get(v).Color == ColorType.White){
+    			V.get(v).p = u;
+    			DFS_SCC_VISIT(v);
+    		}
+    	}
+		V.get(u).Color = ColorType.Black;		    	
+    }
+    
 }
