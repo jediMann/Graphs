@@ -15,6 +15,7 @@ public class Graph
 	private  Stack<Vertex> topologicalStack;
 	private int nVertices;
 	private int directed; //directed = 1 means directed, otherwise not
+//	private int nEdges;
 	
    /*
     * Initializes the map to with size equal to number of vertices in a graph
@@ -45,9 +46,10 @@ public class Graph
            return;
        }
 
+//       nEdges++;
        List<Edge> slist = Adjacency_List.get(source);
   	   slist.add(new Edge(source, destination, weight));
-
+  	   
   	   if(directed != 1){				//not directed
   	  	   List<Edge> dlist = Adjacency_List.get(destination);
   	       dlist.add(new Edge(destination, source, weight));
@@ -375,38 +377,7 @@ public class Graph
     }
 
            
-    //Depth First Search to print the no. of cycles in a graph
-    void DFS_CYCLE(){
-    	System.out.println("----------DFS_CYCLES---------");
-    	
-    	for(int i=1 ; i<= nVertices ; i++){
-    		V.get(i).setVertex(i, ColorType.White, 0, 0 );
-    	}
-    	
-    	for(int i=1 ; i<= nVertices ; i++){
-    		if(V.get(i).Color == ColorType.White)
-    			DFS_VISIT_PRINT_CYCLE(i);
-     	}
-    }   
-    
-    void DFS_VISIT_PRINT_CYCLE(int u){    	
-    	int v;    	
-    	V.get(u).Color = ColorType.Gray;
-    	List<Edge> ulist = Adjacency_List.get(u);
-    	for(Iterator<Edge> it = ulist.iterator(); it.hasNext(); ){
-    		Edge e = it.next();
-    		v = e.getEndVertex();
-    		if(	V.get(v).Color != ColorType.White){
-				System.out.println("Cycle exists at " + V.get(v).getVertex());    		
-    		} else {
-    			V.get(v).p = u;
-    			DFS_VISIT_PRINT_CYCLE(v);
-    		}
-    	}
-		V.get(u).Color = ColorType.Black;		    	
-    }
 
-    
     
     Graph TransposeGraph(){
         
@@ -468,6 +439,60 @@ public class Graph
     		}
     	}
 		V.get(u).Color = ColorType.Black;		    	
+    }
+    
+    
+
+    //Depth First Search to print the no. of cycles in a graph
+    boolean DFS_isCyclic(){
+    	
+    	for(int i=1 ; i<= nVertices ; i++){
+    		V.get(i).setVertex(i, ColorType.White, 0, 0 );
+    	}
+    	
+    	for(int i=1 ; i<= nVertices ; i++){
+    		if(V.get(i).Color == ColorType.White)
+    			if(DFS_VISIT_CYCLE(i))
+    				return true;
+    				
+     	}
+    	return false;
+    }   
+    
+    boolean DFS_VISIT_CYCLE(int u){    	
+    	int v;    	
+    	V.get(u).Color = ColorType.Gray;
+    	List<Edge> ulist = Adjacency_List.get(u);
+    	for(Iterator<Edge> it = ulist.iterator(); it.hasNext(); ){
+    		Edge e = it.next();
+    		v = e.getEndVertex();
+    		
+    		if(	V.get(v).Color == ColorType.White){
+    			V.get(v).p = u;
+    			if(DFS_VISIT_CYCLE(v))
+    				return true;
+    		}
+    		else if(v != V.get(u).p)
+    			return true;
+    	}
+		V.get(u).Color = ColorType.Black;		    	
+		return false;
+    }
+    
+    boolean isUndirectedBinaryTree(){
+    	boolean oneToThreeNeighbours = true;
+    	
+    	for(int v=1; v<= nVertices; v++){
+    		if(Adjacency_List.get(v).size()>3 || Adjacency_List.get(v).size()<1){
+    			oneToThreeNeighbours = false;
+    			break;
+    		}    			
+    	}
+//    	System.out.println("is(E == V-1)? "+ (nEdges ==(nVertices - 1)) );
+    	System.out.println("oneToThreeNeighbours : "+ oneToThreeNeighbours);
+//      int nSCC = StronglyConnectedComponents();
+//      System.out.println("StronglyConnectedComponents : " + nSCC);
+    	return (!DFS_isCyclic() && oneToThreeNeighbours); //&& nSCC == 1
     }
     
 }

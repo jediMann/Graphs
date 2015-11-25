@@ -1,4 +1,3 @@
-//import java.io.File;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.InputMismatchException;
@@ -16,8 +15,10 @@ public class Main {
      *  Presence of a cycle using DFS traversal;
      *  TopologicalSort()
      *  TransposeGraph()
+     *  isBinaryTree()
      */
 
+	
 	public static void main(String...arg) throws FileNotFoundException {
 
         int source , destination, weight;
@@ -55,7 +56,6 @@ public class Main {
             G.Dijkstra(1);
             G.Prims_MST(1);
             G.TopologicalSort();
-            G.DFS_CYCLE();
             
             Graph GT = G.TransposeGraph();
             System.out.println("----TRANSPOSE--------");
@@ -70,4 +70,56 @@ public class Main {
          }
          scan.close();
 	}
+	
+	
+
+/*
+     // Main Function to test isUndirectedBinaryTree() with Binary.txt as input
+	public static void main(String...arg) throws FileNotFoundException {
+
+        int source , destination, weight;
+        int number_of_edges,number_of_vertices;
+        int directed = 0;
+        // Scanner scan = new Scanner(System.in);
+        int T;
+        Scanner scan = new Scanner(new File("Binary.txt"));        
+        try
+        {
+        	T = scan.nextInt();
+        	for(int i=1; i<=T; i++){
+                int count = 1;
+                number_of_vertices = scan.nextInt();
+                number_of_edges = scan.nextInt();
+                System.out.println("Test Case "+ i + ": (V, E) =(" + number_of_vertices + ", "+ number_of_edges +")");
+                directed = 0; //undirected
+                	                
+                Graph G = new Graph(number_of_vertices, directed);
+
+                while (count <= number_of_edges)
+                {
+                    source = scan.nextInt();
+                    destination = scan.nextInt();
+                    G.setEdge(source, destination, 0);
+                    count++;
+                }
+                
+//                G.printAdjacencyList();
+                System.out.println("cyclic : "+G.DFS_isCyclic());
+                if(G.isUndirectedBinaryTree())
+                	System.out.println("This graph " + i + " is Binary");
+                else
+                	System.out.println("This graph " + i + " is not Binary");
+                
+                System.out.println();
+
+        	}            
+         } 
+         catch(InputMismatchException inputMismatch)
+         {
+             System.out.println("Error in Input Format. \nFormat : <source index> <destination index>");
+         }
+         scan.close();
+	}
+*/
 }
+
